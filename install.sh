@@ -1,8 +1,8 @@
 #!/bin/bash
-# CodeLookup skill installer wrapper
+# CodeLookup skill installer wrapper for TS execution
 
-if [ -f "./bin/install.js" ]; then
-  node bin/install.js "$@"
+if [ -f "./bin/install.ts" ]; then
+  npx ts-node bin/install.ts "$@"
 else
-  npx -y github:username/CodeLookup "$@"
+  npx -y CodeLookup "$@"
 fi

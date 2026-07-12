@@ -1,18 +1,22 @@
-#!/usr/bin/env node
-const fs = require('fs');
-const path = require('path');
-const { spawnSync } = require('child_process');
+#!/usr/bin/env ts-node
+import * as fs from 'fs';
+import * as path from 'path';
+import { spawnSync } from 'child_process';
 
 const cwd = process.cwd();
 const graphPath = path.join(cwd, '.codelookup', 'graph.json');
 
-// Run git diff to find modified files
-function getModifiedFiles() {
+interface DependencyGraph {
+  dependencies: { [key: string]: string[] };
+  dependents: { [key: string]: string[] };
+}
+
+function getModifiedFiles(): string[] {
   const diff = spawnSync('git', ['diff', '--name-only'], { encoding: 'utf8' });
   const diffCached = spawnSync('git', ['diff', '--cached', '--name-only'], { encoding: 'utf8' });
   const status = spawnSync('git', ['status', '--porcelain'], { encoding: 'utf8' });
 
-  const files = new Set();
+  const files = new Set<string>();
 
   if (diff.status === 0) {
     diff.stdout.split('\n').forEach(f => f.trim() && files.add(f.trim().replace(/\\/g, '/')));
@@ -31,12 +35,11 @@ function getModifiedFiles() {
   return Array.from(files);
 }
 
-// Build graph if missing
-function loadOrBuildGraph() {
+function loadOrBuildGraph(): DependencyGraph {
   if (!fs.existsSync(graphPath)) {
     console.log('Dependency graph cache missing. Generating...');
-    const genScript = path.join(__dirname, 'generate-graph.js');
-    const res = spawnSync('node', [genScript], { stdio: 'inherit' });
+    const genScript = path.join(__dirname, 'generate-graph.ts');
+    const res = spawnSync('npx', ['ts-node', genScript], { stdio: 'inherit', shell: true });
     if (res.status !== 0) {
       console.error('Failed to generate dependency graph.');
       process.exit(1);
@@ -44,9 +47,9 @@ function loadOrBuildGraph() {
   }
 
   try {
-    return JSON.parse(fs.readFileSync(graphPath, 'utf8'));
+    return JSON.parse(fs.readFileSync(graphPath, 'utf8')) as DependencyGraph;
   } catch (err) {
-    console.error(`Failed to read graph: ${err.message}`);
+    console.error(`Failed to read graph: ${(err as Error).message}`);
     process.exit(1);
   }
 }
@@ -68,25 +71,25 @@ console.log('Modified Files Detected:');
 modifiedFiles.forEach(f => console.log(`  - ${f}`));
 console.log('');
 
-// Find all dependents recursively
-const affected = new Map(); // file -> parent dependents list
-const mermaidEdges = [];
+const affected = new Map<string, string[]>();
+const mermaidEdges: string[] = [];
 
-function trace(file, caller = null) {
+function trace(file: string, caller: string | null = null): void {
   if (caller) {
     if (!affected.has(file)) {
       affected.set(file, []);
     }
-    if (!affected.get(file).includes(caller)) {
-      affected.get(file).push(caller);
+    const callers = affected.get(file)!;
+    if (!callers.includes(caller)) {
+      callers.push(caller);
       mermaidEdges.push(`  ${caller} --> ${file}`);
     }
   }
 
   const deps = dependentsMap[file] || [];
   for (const dep of deps) {
-    // Prevent infinite cycles
-    if (affected.has(dep) && affected.get(dep).includes(file)) continue;
+    const callers = affected.get(dep);
+    if (callers && callers.includes(file)) continue;
     trace(dep, file);
   }
 }
@@ -107,12 +110,10 @@ if (affected.size === 0) {
   console.log('=========================================\n');
   console.log('```mermaid');
   console.log('flowchart TD');
-  // Define styles for modified files
   modifiedFiles.forEach(f => {
     const id = f.replace(/[^a-zA-Z0-9]/g, '_');
     console.log(`  ${id}["${f} (Modified)"]:::modified`);
   });
-  // Define nodes for dependents
   affected.forEach((_, f) => {
     if (!modifiedFiles.includes(f)) {
       const id = f.replace(/[^a-zA-Z0-9]/g, '_');
@@ -120,8 +121,7 @@ if (affected.size === 0) {
     }
   });
 
-  // Print edges
-  const edgeSet = new Set();
+  const edgeSet = new Set<string>();
   mermaidEdges.forEach(edge => {
     const parts = edge.split('-->').map(p => p.trim());
     const id1 = parts[0].replace(/[^a-zA-Z0-9]/g, '_');

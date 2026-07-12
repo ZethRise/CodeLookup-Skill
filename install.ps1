@@ -1,7 +1,7 @@
-# CodeLookup skill installer wrapper for PowerShell
+# CodeLookup skill installer wrapper for TS execution on PowerShell
 
-if (Test-Path "./bin/install.js") {
-  node bin/install.js $args
+if (Test-Path "./bin/install.ts") {
+  npx ts-node bin/install.ts $args
 } else {
-  npx -y github:username/CodeLookup $args
+  npx -y CodeLookup $args
 }

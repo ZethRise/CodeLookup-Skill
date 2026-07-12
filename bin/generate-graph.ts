@@ -1,22 +1,26 @@
-#!/usr/bin/env node
-const fs = require('fs');
-const path = require('path');
+#!/usr/bin/env ts-node
+import * as fs from 'fs';
+import * as path from 'path';
 
 const cwd = process.cwd();
 const outputDir = path.join(cwd, '.codelookup');
 const outputFile = path.join(outputDir, 'graph.json');
 
-const EXCLUDE_DIRS = new Set(['node_modules', '.git', '.github', '.agents', '.codelookup', 'dist', 'build']);
-const SUPPORTED_EXTENSIONS = new Set(['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.py', '.go']);
+const EXCLUDE_DIRS = new Set<string>(['node_modules', '.git', '.github', '.agents', '.codelookup', 'dist', 'build']);
+const SUPPORTED_EXTENSIONS = new Set<string>(['.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.py', '.go']);
 
-const graph = {
-  dependencies: {}, // file -> what it imports
-  dependents: {}    // file -> what imports it
+interface DependencyGraph {
+  dependencies: { [key: string]: string[] };
+  dependents: { [key: string]: string[] };
+}
+
+const graph: DependencyGraph = {
+  dependencies: {},
+  dependents: {}
 };
 
-// Traverse directory recursively
-function walk(dir) {
-  let files = [];
+function walk(dir: string): string[] {
+  let files: string[] = [];
   try {
     const list = fs.readdirSync(dir, { withFileTypes: true });
     for (const entry of list) {
@@ -36,16 +40,14 @@ function walk(dir) {
   return files;
 }
 
-// Parse JS/TS imports
-function parseJsImports(content, filePath) {
-  const imports = [];
+function parseJsImports(content: string, filePath: string): string[] {
+  const imports: string[] = [];
   const dir = path.dirname(filePath);
 
-  // Regexes for import / require / export
   const importRegex = /(?:import|export)\s+[\s\S]*?\s+from\s+['"]([^'"]+)['"]/g;
   const requireRegex = /require\(['"]([^'"]+)['"]\)/g;
 
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = importRegex.exec(content)) !== null) {
     imports.push(match[1]);
   }
@@ -56,15 +58,13 @@ function parseJsImports(content, filePath) {
   return resolveImports(imports, dir);
 }
 
-// Parse Python imports
-function parsePyImports(content, filePath) {
-  const imports = [];
-  const dir = path.dirname(filePath);
+function parsePyImports(content: string, filePath: string): string[] {
+  const imports: string[] = [];
 
   const importRegex = /^\s*import\s+([\w.,\s]+)/gm;
   const fromImportRegex = /^\s*from\s+([\w.]+)\s+import/gm;
 
-  let match;
+  let match: RegExpExecArray | null;
   while ((match = importRegex.exec(content)) !== null) {
     match[1].split(',').forEach(name => imports.push(name.trim()));
   }
@@ -72,18 +72,14 @@ function parsePyImports(content, filePath) {
     imports.push(match[1].trim());
   }
 
-  // Simplistic resolution for python: we just save the module names
   return imports;
 }
 
-// Resolve import strings to relative file paths (best effort)
-function resolveImports(importList, fileDir) {
-  const resolved = [];
+function resolveImports(importList: string[], fileDir: string): string[] {
+  const resolved: string[] = [];
   for (const imp of importList) {
-    // Only resolve relative project files
     if (imp.startsWith('.')) {
       const fullPath = path.resolve(fileDir, imp);
-      // Try common extensions
       const candidates = [
         fullPath,
         fullPath + '.ts',
@@ -112,7 +108,7 @@ for (const file of allFiles) {
   const relPath = path.relative(cwd, file).replace(/\\/g, '/');
   try {
     const content = fs.readFileSync(file, 'utf8');
-    let imports = [];
+    let imports: string[] = [];
     if (file.endsWith('.py')) {
       imports = parsePyImports(content, file);
     } else {
@@ -135,12 +131,11 @@ for (const file of allFiles) {
   }
 }
 
-// Write output
 try {
   fs.mkdirSync(outputDir, { recursive: true });
   fs.writeFileSync(outputFile, JSON.stringify(graph, null, 2));
   console.log(`Dependency graph saved to ${outputFile}`);
 } catch (err) {
-  console.error(`Failed to write graph file: ${err.message}`);
+  console.error(`Failed to write graph file: ${(err as Error).message}`);
   process.exit(1);
 }

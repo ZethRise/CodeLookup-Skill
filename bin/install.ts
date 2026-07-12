@@ -1,13 +1,18 @@
-#!/usr/bin/env node
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
+#!/usr/bin/env ts-node
+import * as fs from 'fs';
+import * as path from 'path';
+import * as os from 'os';
 
 const home = os.homedir();
 const cwd = process.cwd();
 
-// Target configuration
-const targets = [
+interface TargetConfig {
+  name: string;
+  dir: string;
+  file: string;
+}
+
+const targets: TargetConfig[] = [
   // Gemini global config root
   {
     name: 'Gemini (global)',
@@ -47,8 +52,8 @@ const targets = [
 ];
 
 const srcSkill = path.join(__dirname, '..', 'skills', 'codelookup', 'SKILL.md');
-const srcGenGraph = path.join(__dirname, 'generate-graph.js');
-const srcPreCheck = path.join(__dirname, 'pre-check.js');
+const srcGenGraph = path.join(__dirname, 'generate-graph.ts');
+const srcPreCheck = path.join(__dirname, 'pre-check.ts');
 
 if (!fs.existsSync(srcSkill)) {
   console.error(`Error: Source skill file not found at ${srcSkill}`);
@@ -60,34 +65,29 @@ console.log('Installing CodeLookup skill and helper scripts...');
 let installedCount = 0;
 for (const target of targets) {
   try {
-    // If local target and not in a project workspace, skip local ones
     if (target.name.includes('(local)') && !fs.existsSync(path.join(cwd, '.git')) && !fs.existsSync(path.join(cwd, 'package.json'))) {
       continue;
     }
 
-    // Make target directory
     fs.mkdirSync(target.dir, { recursive: true });
 
-    // Copy skill file
     const destSkillPath = path.join(target.dir, target.file);
     fs.copyFileSync(srcSkill, destSkillPath);
 
-    // Make bin subdirectory inside target for helper scripts
     const targetBinDir = path.join(target.dir, 'bin');
     fs.mkdirSync(targetBinDir, { recursive: true });
 
-    // Copy helper scripts
     if (fs.existsSync(srcGenGraph)) {
-      fs.copyFileSync(srcGenGraph, path.join(targetBinDir, 'generate-graph.js'));
+      fs.copyFileSync(srcGenGraph, path.join(targetBinDir, 'generate-graph.ts'));
     }
     if (fs.existsSync(srcPreCheck)) {
-      fs.copyFileSync(srcPreCheck, path.join(targetBinDir, 'pre-check.js'));
+      fs.copyFileSync(srcPreCheck, path.join(targetBinDir, 'pre-check.ts'));
     }
 
     console.log(`[OK] Installed to ${target.name}: ${target.dir}`);
     installedCount++;
   } catch (err) {
-    console.error(`[FAIL] Could not install to ${target.name}: ${err.message}`);
+    console.error(`[FAIL] Could not install to ${target.name}: ${(err as Error).message}`);
   }
 }
 

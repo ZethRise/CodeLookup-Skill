@@ -1,4 +1,22 @@
+# Dependency graph cache
 .codelookup/
+
+# Dependencies
 node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Editor and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Mock test files
 test-dep.js
 test-caller.js

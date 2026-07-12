@@ -11,14 +11,31 @@ CodeLookup is an intelligent dependency checker and safety skill for AI coding a
 
 ## Installation
 
-### macOS / Linux (One-Liner)
+### NPX (One-Liner - Recommended)
 
+Run the installer interactively from the NPM registry:
+```bash
+npx codelookup
+```
+
+You can also run it silently to install to all detected directories:
+```bash
+npx codelookup --all
+```
+
+To uninstall CodeLookup from all directories:
+```bash
+npx codelookup --uninstall
+```
+
+### Manual Platform Shell Shims
+
+#### macOS / Linux
 ```bash
 curl -fsSL https://raw.githubusercontent.com/username/CodeLookup/main/install.sh | bash
 ```
 
-### Windows (PowerShell One-Liner)
-
+#### Windows (PowerShell)
 ```powershell
 irm https://raw.githubusercontent.com/username/CodeLookup/main/install.ps1 | iex
 ```
@@ -28,22 +45,21 @@ irm https://raw.githubusercontent.com/username/CodeLookup/main/install.ps1 | iex
 ```bash
 git clone https://github.com/username/CodeLookup.git
 cd CodeLookup
-node bin/install.js
+npm install
+npx ts-node bin/install.ts
 ```
 
 ## Usage
 
-Once installed, the skill instructions are copied to global agent folders. The agent reads the instructions and performs dependency lookups automatically before applying edits:
+Once installed, the skill instructions are copied to target agent config directories. The agent reads the instructions and performs dependency checks automatically:
 
 1. Build/update the graph cache:
    ```bash
    npx codelookup-build
-   # or node bin/generate-graph.js
    ```
 2. Run the impact analysis checker:
    ```bash
    npx codelookup-check
-   # or node bin/pre-check.js
    ```
 
 ## Supported Agents

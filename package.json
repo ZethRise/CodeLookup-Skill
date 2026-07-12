@@ -1,6 +1,6 @@
 {
-  "name": "CodeLookup",
-  "version": "0.2.0",
+  "name": "codelookup",
+  "version": "0.3.0",
   "description": "CodeLookup installer - detects your AI coding agents and installs codelookup for each one.",
   "license": "MIT",
   "bin": {

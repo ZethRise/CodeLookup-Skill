@@ -1,0 +1,24 @@
+{
+  "name": "codelookup-installer",
+  "version": "0.1.0",
+  "description": "CodeLookup installer - detects your AI coding agents and installs codelookup for each one.",
+  "license": "MIT",
+  "bin": {
+    "codelookup": "./bin/install.js",
+    "codelookup-build": "./bin/generate-graph.js",
+    "codelookup-check": "./bin/pre-check.js"
+  },
+  "scripts": {
+    "build-graph": "node bin/generate-graph.js",
+    "check": "node bin/pre-check.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "files": [
+    "bin/",
+    "skills/",
+    "README.md",
+    "INSTALL.md"
+  ]
+}

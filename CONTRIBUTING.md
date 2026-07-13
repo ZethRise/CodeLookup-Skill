@@ -6,7 +6,7 @@ Thank you for contributing! Here is how to get started.
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/username/CodeLookup.git
+   git clone https://github.com/ZethRise/CodeLookup-Skill.git
    cd CodeLookup
    ```
 2. Run installation locally to test hooks and settings:

@@ -32,19 +32,19 @@ npx codelookup --uninstall
 
 #### macOS / Linux
 ```bash
-curl -fsSL https://raw.githubusercontent.com/ZethRise/CodeLookup-Skill/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ZethRise/CodeLookup-Skill/master/install.sh | bash
 ```
 
 #### Windows (PowerShell)
 ```powershell
-irm https://raw.githubusercontent.com/ZethRise/CodeLookup-Skill/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/ZethRise/CodeLookup-Skill/master/install.ps1 | iex
 ```
 
 ### Local Checkout (All Platforms)
 
 ```bash
 git clone https://github.com/ZethRise/CodeLookup-Skill.git
-cd CodeLookup
+cd CodeLookup-Skill
 npm install
 npx ts-node bin/install.ts
 ```

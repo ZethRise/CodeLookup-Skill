@@ -19,5 +19,5 @@ irm https://raw.githubusercontent.com/ZethRise/CodeLookup-Skill/main/install.ps1
 ```bash
 git clone https://github.com/ZethRise/CodeLookup-Skill.git
 cd CodeLookup
-node bin/install.js
+node dist/install.js
 ```

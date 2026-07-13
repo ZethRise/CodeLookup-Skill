@@ -1,27 +1,29 @@
 {
   "name": "codelookup",
-  "version": "0.3.0",
+  "version": "0.5.0",
   "description": "CodeLookup installer - detects your AI coding agents and installs codelookup for each one.",
   "license": "MIT",
   "bin": {
-    "codelookup": "./bin/install.ts",
-    "codelookup-build": "./bin/generate-graph.ts",
-    "codelookup-check": "./bin/pre-check.ts"
+    "codelookup": "dist/install.js",
+    "codelookup-build": "dist/generate-graph.js",
+    "codelookup-check": "dist/pre-check.js"
   },
   "engines": {
     "node": ">=18"
   },
   "files": [
-    "bin/",
+    "dist/",
     "skills/",
     "README.md",
     "INSTALL.md"
   ],
-  "dependencies": {
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+  "scripts": {
+    "build": "tsc",
+    "prepack": "npm run build",
+    "test": "npm run build && node dist/generate-graph.js && node dist/pre-check.js"
   },
   "devDependencies": {
-    "@types/node": "^20.11.0"
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
   }
 }

@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node
 import * as fs from 'fs';
 import * as path from 'path';
 import { spawnSync } from 'child_process';
@@ -38,8 +38,8 @@ function getModifiedFiles(): string[] {
 function loadOrBuildGraph(): DependencyGraph {
   if (!fs.existsSync(graphPath)) {
     console.log('Dependency graph cache missing. Generating...');
-    const genScript = path.join(__dirname, 'generate-graph.ts');
-    const res = spawnSync('npx', ['ts-node', genScript], { stdio: 'inherit', shell: true });
+    const genScript = path.join(__dirname, 'generate-graph.js');
+    const res = spawnSync(process.execPath, [genScript], { stdio: 'inherit' });
     if (res.status !== 0) {
       console.error('Failed to generate dependency graph.');
       process.exit(1);

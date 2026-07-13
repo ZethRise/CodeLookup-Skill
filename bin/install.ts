@@ -1,4 +1,4 @@
-#!/usr/bin/env ts-node
+#!/usr/bin/env node
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
@@ -61,8 +61,8 @@ const targets: TargetConfig[] = [
 ];
 
 const srcSkill = path.join(__dirname, '..', 'skills', 'codelookup', 'SKILL.md');
-const srcGenGraph = path.join(__dirname, 'generate-graph.ts');
-const srcPreCheck = path.join(__dirname, 'pre-check.ts');
+const srcGenGraph = path.join(__dirname, 'generate-graph.js');
+const srcPreCheck = path.join(__dirname, 'pre-check.js');
 
 function checkLocalWorkspace(): boolean {
   return fs.existsSync(path.join(cwd, '.git')) || fs.existsSync(path.join(cwd, 'package.json'));
@@ -92,10 +92,10 @@ function installTo(target: TargetConfig) {
     fs.mkdirSync(targetBinDir, { recursive: true });
 
     if (fs.existsSync(srcGenGraph)) {
-      fs.copyFileSync(srcGenGraph, path.join(targetBinDir, 'generate-graph.ts'));
+      fs.copyFileSync(srcGenGraph, path.join(targetBinDir, 'generate-graph.js'));
     }
     if (fs.existsSync(srcPreCheck)) {
-      fs.copyFileSync(srcPreCheck, path.join(targetBinDir, 'pre-check.ts'));
+      fs.copyFileSync(srcPreCheck, path.join(targetBinDir, 'pre-check.js'));
     }
 
     console.log(`[OK] Installed to ${target.name}: ${target.dir}`);
